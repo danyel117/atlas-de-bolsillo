@@ -61,7 +61,7 @@ https://beaming-chinchilla-93.convex.site/api/auth/callback/github
 
 Configura `GITHUB_APP_MODE=true` para que Better Auth use los permisos de la GitHub App en lugar de solicitar scopes de OAuth. También se puede usar una OAuth app omitiendo esa variable. Usa otra aplicación para desarrollo, con el callback de su propio dominio `.convex.site`. Los correos de magic link pasan por Resend; el enlace caduca en 10 minutos, se usa una vez y su token se almacena mediante un hash. No se registran enlaces ni tokens en logs.
 
-Para enviar desde un dominio propio, verifícalo en Resend publicando los registros DKIM y SPF/MX indicados. Atlas usa el dominio completo `danielsaldarriaga.com`: el DKIM corresponde a `resend._domainkey` y el Return-Path de envío a `send`, con los valores exactos que entregue Resend. Conserva los MX existentes del dominio raíz. Mantén Resend en Free y Convex en Free, sin activar planes con facturación por consumo. Las cuotas de los proveedores se aplican: al agotarlas se puede interrumpir el acceso o guardado. El juego sin cuenta sigue funcionando mientras se puedan descargar sus archivos.
+Para enviar desde un dominio propio, verifícalo en Resend publicando los registros DKIM y de envío indicados. Atlas usa el dominio completo `danielsaldarriaga.com`: el DKIM corresponde a `resend._domainkey` y los CNAME de envío a `rsend` y `send`, con los valores exactos que entregue Resend para la región Irlanda. Conserva los MX existentes del dominio raíz. Mantén Resend en Free y Convex en Free, sin activar planes con facturación por consumo. Las cuotas de los proveedores se aplican: al agotarlas se puede interrumpir el acceso o guardado. El juego sin cuenta sigue funcionando mientras se puedan descargar sus archivos.
 
 ## Datos y límites
 
