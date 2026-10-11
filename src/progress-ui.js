@@ -13,7 +13,9 @@ function chart(records){
   const points=sample.map(point);
   return `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Aciertos de las últimas ${sample.length} partidas: ${sample.map(g=>g.percentage+'%').join(', ')}"><g class="chart-grid">${[0,50,100].map(n=>`<line x1="35" x2="625" y1="${20+(100-n)*1.25}" y2="${20+(100-n)*1.25}"/><text x="1" y="${24+(100-n)*1.25}">${n}%</text>`).join('')}</g>${points.length>1?`<polyline class="chart-line" points="${points.map(p=>p.join(',')).join(' ')}"/>`:''}${points.map((p,i)=>`<circle class="chart-point" cx="${p[0]}" cy="${p[1]}" r="4"><title>${date(sample[i].completedAt)}: ${sample[i].percentage}%</title></circle>`).join('')}</svg>`;
 }
-export function progressPage(app,{home,login}){
+export function progressPage(app,{home,login,initialRegion,initialMode}){
+  if(continents.some(c=>c.id===initialRegion))region=initialRegion;
+  if(Object.hasOwn(modeNames,initialMode))mode=initialMode;
   const token=++revision;
   function render(message=''){
     if(token!==revision)return;

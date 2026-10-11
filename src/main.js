@@ -72,7 +72,7 @@ function results() {
   app.querySelector('.retry')?.addEventListener('click',()=>start(summary.mistakes.map(a=>a.country)));
   app.querySelector('.again').addEventListener('click',()=>start());
   app.querySelector('.home').addEventListener('click',()=>{home();window.scrollTo({top:0,behavior:'instant'});});
-  app.querySelector('.see-progress').onclick=showProgress;
+  app.querySelector('.see-progress').onclick=()=>showProgress({continent:selected,mode:savedAttempt?.mode});
   app.querySelector('.save-account')?.addEventListener('click',openAccount);
   if(!savedAttempt){
     savedAttempt=createAttempt({attemptId,continent:selected,mode:roundKind==='retry'?'practice':length==='all'?'full':'quick',duration:resultDuration,answers});
@@ -86,10 +86,10 @@ function results() {
   window.scrollTo({top:0,behavior:'instant'});
 }
 function openAccount(){accountDialog({inGame:page==='game',onLogout:()=>{if(page==='progress')showProgress();}});}
-function showProgress(){
+function showProgress(focus){
   if(page==='game'){confirmExit(()=>{page='progress';showProgress();});return;}
   stopProgress?.();page='progress';
-  stopProgress=progressPage(app,{home:(continent,mode)=>{if(continent){selected=continent;length=mode==='full'?'all':10;}home();window.scrollTo({top:0,behavior:'instant'});},login:openAccount});
+  stopProgress=progressPage(app,{home:(continent,mode)=>{if(continent){selected=continent;length=mode==='full'?'all':10;}home();window.scrollTo({top:0,behavior:'instant'});},login:openAccount,initialRegion:focus?.continent,initialMode:focus?.mode});
   window.scrollTo({top:0,behavior:'instant'});
 }
 function credits() {
