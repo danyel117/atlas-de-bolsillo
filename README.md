@@ -2,53 +2,88 @@
 
 Un pequeño juego. Un mundo enorme.
 
-Juego de geografía en español: elige un continente, reconoce el país resaltado en el mapa y selecciona su nombre. Al terminar, consulta tus aciertos, repasa tus respuestas y practica únicamente los países que fallaste.
+Juego de geografía en español: elige un continente, reconoce el país resaltado en el mapa y selecciona su nombre. Al terminar, consulta tus aciertos, repasa tus respuestas y practica los países que fallaste. Compatible con celular, tableta y escritorio.
 
 ## Jugar
 
-**[Abrir Atlas de bolsillo](https://atlas-de-bolsillo.vercel.app)** — gratuito, sin registro y compatible con celular.
+[Atlas de bolsillo](https://atlas-de-bolsillo.vercel.app)
 
-- Seis regiones: Europa, África, Asia, Norteamérica, Sudamérica y Oceanía.
-- 195 países: 193 miembros de la ONU, Palestina y Ciudad del Vaticano.
+- Seis regiones y 195 países: 193 miembros de la ONU, Palestina y Ciudad del Vaticano.
 - Viaje rápido de 10 países o continente completo, sin repeticiones.
-- Cuatro respuestas posibles, corrección inmediata y resumen final.
-- Marcadores visibles para países pequeños e islas.
-- Diseño para celular, tableta y escritorio; navegación con teclado (1–4).
-- Tu mejor puntuación se guarda en tu navegador. Sin cuentas, publicidad ni seguimiento.
+- Cuatro respuestas, corrección inmediata, resumen y práctica de fallos.
+- Marcadores para países pequeños e islas; controles de teclado (1–4).
+- Historial por continente, evolución de aciertos y descarga en CSV. Viajes rápidos, completos y práctica se comparan por separado.
+- Sin cuenta, las partidas quedan en este navegador. Con GitHub o un enlace por correo, se guardan en Convex y puedes consultarlas desde otro dispositivo. Las partidas locales se importan solo al solicitarlo y reciben la fecha de importación.
+- Sin publicidad ni cookies de seguimiento. Better Auth mantiene la sesión en almacenamiento local para el acceso entre dominios.
 
-Norteamérica incluye Centroamérica y el Caribe. Rusia se juega en Europa; Turquía, Chipre y Kazajistán, en Asia. Cada país pertenece a una sola región de juego. La Antártida no tiene países soberanos. El juego usa límites simplificados; los mapas no expresan una posición sobre territorios disputados.
+Norteamérica incluye Centroamérica y el Caribe. Rusia se juega en Europa; Turquía, Chipre y Kazajistán, en Asia. Cada país pertenece a una sola región. La Antártida no tiene países soberanos. Los límites son simplificados y no expresan una posición sobre territorios disputados.
 
 ## Desarrollo
 
-Node.js 22.12+ o 24 y npm.
+Node.js 24 y npm:
 
 ```sh
 npm ci
-npm run dev
+npm run dev -- --port 5174
+npm run typecheck
+npm test
+npm run build
 ```
+
+Para desarrollar con tu propio backend:
 
 ```sh
-npm test       # reglas del juego, puntuación, opciones y visibilidad de los 195 marcadores
-npm run build # genera dist/
-npm run preview
+npx convex dev
 ```
 
-Los datos y mapas están incluidos en el repositorio: no dependemos de una API externa para jugar. Para regenerarlos desde las versiones fijadas:
+Convex crea `.env.local` con tus URLs públicas. Comprueba que incluya `VITE_CONVEX_URL` y `VITE_CONVEX_SITE_URL`. Configura `SITE_URL=http://localhost:5174` en el deployment de desarrollo y usa ese origen exacto para navegar. El cliente consulta el servidor bajo demanda, sin suscripciones continuas al historial.
 
-```sh
-npm run data
+Mapas y países están incluidos en el repositorio; jugar no requiere una API geográfica externa. `npm run data` regenera los datos desde las dependencias fijadas. Las tipografías vienen de Google Fonts, con fuentes de respaldo.
+
+## Configurar el acceso
+
+Los secretos pertenecen al backend de Convex. **Nunca** uses un prefijo `VITE_` para un secreto, lo incluyas en Git o lo pases como argumento del shell. `npx convex env set NOMBRE` permite introducirlo por stdin. Añade `--prod` para producción.
+
+| Variable en Convex | Valor o finalidad |
+| --- | --- |
+| `SITE_URL` | Origen del frontend; producción: `https://atlas.juegos.danielsaldarriaga.com` |
+| `BETTER_AUTH_SECRET` | Valor aleatorio de al menos 32 caracteres, distinto en desarrollo y producción |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | OAuth app personal de GitHub para Atlas |
+| `RESEND_API_KEY` | API key de Resend con permiso de envío, restringida al dominio de Atlas |
+| `EMAIL_FROM` | Remitente perteneciente al dominio verificado en Resend |
+
+Registra la OAuth app con la web de Atlas como Homepage y la siguiente Redirect URI para este deployment de producción:
+
+```text
+https://beaming-chinchilla-93.convex.site/api/auth/callback/github
 ```
 
-Las fuentes tipográficas se cargan desde Google Fonts con fuentes de respaldo. Los resultados son locales al navegador y los récords se separan por región y cantidad de preguntas.
+Usa otra OAuth app para desarrollo, con el callback de su propio dominio `.convex.site`. GitHub solo necesita los permisos de perfil y correo, sin acceso a repositorios. Los correos de magic link pasan por Resend; el enlace caduca en 10 minutos, se usa una vez y su token se almacena mediante un hash. No se registran enlaces ni tokens en logs.
+
+Para enviar desde un dominio propio, verifícalo en Resend publicando los registros DKIM y SPF/MX indicados. Mantén Resend en Free y Convex en Free, sin activar planes con facturación por consumo. Las cuotas de los proveedores se aplican: al agotarlas se puede interrumpir el acceso o guardado. El juego sin cuenta sigue funcionando mientras se puedan descargar sus archivos.
+
+## Datos y límites
+
+Convex obtiene el usuario de la sesión verificada: cada persona solo consulta y guarda su propio historial. El servidor calcula la puntuación a partir de las respuestas y rechaza países repetidos, regiones incorrectas y rondas incompletas. Los IDs de partida evitan duplicados al reintentar una subida.
+
+El historial admite 2.000 partidas por cuenta y hasta 100 nuevas partidas al día. La consulta devuelve resúmenes; las respuestas completas permanecen en el servidor. Si falla la conexión, se conservan las subidas pendientes en el navegador y se reintentan al volver a estar online o desde Mi progreso. Si el navegador impide guardar, la interfaz avisa y mantiene la partida solo en memoria durante esa visita. El CSV incluye todas las partidas visibles, también las pendientes.
+
+La evolución compara la primera y última partida hasta tener diez resultados del mismo tipo y continente; a partir de diez compara la media de las primeras y últimas cinco. La gráfica muestra las últimas veinte partidas.
 
 ## Despliegue
 
-Aplicación estática con Vite. En Vercel selecciona el preset Vite, `npm run build` y el directorio de salida `dist`. No necesita variables de entorno, base de datos ni funciones. El repositorio está conectado al espacio personal del propietario en Vercel.
+Frontend estático Vite en Vercel Hobby: `npm run build`, salida `dist`. `.env.production` contiene únicamente las URLs **públicas** de Convex; no requiere secretos en Vercel. Para otro proyecto cambia esas URLs. `.env.local` tiene prioridad al compilar localmente: usa las URLs del destino que quieras comprobar.
 
-## Contribuir
+Backend:
 
-Consulta [CONTRIBUTING.md](CONTRIBUTING.md). Son bienvenidas mejoras de accesibilidad, cartografía y aprendizaje. Ejecuta las pruebas y el build antes de enviar una contribución.
+```sh
+npx convex deploy
+```
 
-## Licencias
+GitHub Actions comprueba tipos, reglas del juego, propiedad del historial, puntuación y reintentos. El despliegue de Convex se hace por separado; un build correcto del frontend no prueba que el backend esté desplegado o que GitHub/Resend estén configurados. Verifica ambos accesos con sus proveedores reales después de cambiar su configuración.
 
-Código: [MIT](LICENSE). Base de países: ODbL 1.0. Cartografía: dominio público de Natural Earth. Consulta [DATA_LICENSE.md](DATA_LICENSE.md) para fuentes y atribución.
+El dominio personalizado se conecta con un CNAME `atlas.juegos` al destino indicado por Vercel, sin proxy de Cloudflare. Los orígenes permitidos en producción son el dominio personalizado y el alias público de Vercel.
+
+## Contribuir y licencias
+
+Consulta [CONTRIBUTING.md](CONTRIBUTING.md). Código [MIT](LICENSE), datos ODbL 1.0 y cartografía de dominio público de Natural Earth: [DATA_LICENSE.md](DATA_LICENSE.md).
