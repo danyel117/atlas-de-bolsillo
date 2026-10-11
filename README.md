@@ -6,6 +6,8 @@ Juego de geografía en español: elige un continente, reconoce el país resaltad
 
 ## Jugar
 
+**[Abrir Atlas de bolsillo](https://atlas-de-bolsillo.vercel.app)** — gratuito, sin registro y compatible con celular.
+
 - Seis regiones: Europa, África, Asia, Norteamérica, Sudamérica y Oceanía.
 - 195 países: 193 miembros de la ONU, Palestina y Ciudad del Vaticano.
 - Viaje rápido de 10 países o continente completo, sin repeticiones.
