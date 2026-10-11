@@ -12,7 +12,7 @@ export const createAuth=(ctx:GenericCtx<DataModel>)=>betterAuth({
   appName:'Atlas de bolsillo',baseURL:process.env.CONVEX_SITE_URL,trustedOrigins,
   database:authComponent.adapter(ctx),
   socialProviders:process.env.GITHUB_CLIENT_ID&&process.env.GITHUB_CLIENT_SECRET?{
-    github:{clientId:process.env.GITHUB_CLIENT_ID,clientSecret:process.env.GITHUB_CLIENT_SECRET},
+    github:{clientId:process.env.GITHUB_CLIENT_ID,clientSecret:process.env.GITHUB_CLIENT_SECRET,disableDefaultScope:process.env.GITHUB_APP_MODE==='true'},
   }:{},
   account:{accountLinking:{enabled:true}},
   rateLimit:{enabled:true,storage:'database',window:60,max:30},

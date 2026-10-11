@@ -6,7 +6,7 @@ Juego de geografía en español: elige un continente, reconoce el país resaltad
 
 ## Jugar
 
-[Atlas de bolsillo](https://atlas-de-bolsillo.vercel.app)
+[Atlas de bolsillo](https://atlas.juegos.danielsaldarriaga.com)
 
 - Seis regiones y 195 países: 193 miembros de la ONU, Palestina y Ciudad del Vaticano.
 - Viaje rápido de 10 países o continente completo, sin repeticiones.
@@ -48,19 +48,20 @@ Los secretos pertenecen al backend de Convex. **Nunca** uses un prefijo `VITE_` 
 | --- | --- |
 | `SITE_URL` | Origen del frontend; producción: `https://atlas.juegos.danielsaldarriaga.com` |
 | `BETTER_AUTH_SECRET` | Valor aleatorio de al menos 32 caracteres, distinto en desarrollo y producción |
-| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | OAuth app personal de GitHub para Atlas |
-| `RESEND_API_KEY` | API key de Resend con permiso de envío, restringida al dominio de Atlas |
-| `EMAIL_FROM` | Remitente perteneciente al dominio verificado en Resend |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | Credenciales de una GitHub App o una OAuth app personal para Atlas |
+| `GITHUB_APP_MODE` | `true` para una GitHub App; omitir para una OAuth app |
+| `RESEND_API_KEY` | API key de Resend con permiso `sending_access`, restringida a `danielsaldarriaga.com` |
+| `EMAIL_FROM` | `Atlas de bolsillo <atlas@danielsaldarriaga.com>` tras verificar el dominio en Resend |
 
-Registra la OAuth app con la web de Atlas como Homepage y la siguiente Redirect URI para este deployment de producción:
+Producción usa la [GitHub App personal de Atlas](https://github.com/apps/atlas-de-bolsillo-daniel), con permiso de lectura del correo y sin permisos de repositorios. Para una instalación propia, registra una GitHub App con la web de Atlas como Homepage y la siguiente callback URL para este deployment de producción:
 
 ```text
 https://beaming-chinchilla-93.convex.site/api/auth/callback/github
 ```
 
-Usa otra OAuth app para desarrollo, con el callback de su propio dominio `.convex.site`. GitHub solo necesita los permisos de perfil y correo, sin acceso a repositorios. Los correos de magic link pasan por Resend; el enlace caduca en 10 minutos, se usa una vez y su token se almacena mediante un hash. No se registran enlaces ni tokens en logs.
+Configura `GITHUB_APP_MODE=true` para que Better Auth use los permisos de la GitHub App en lugar de solicitar scopes de OAuth. También se puede usar una OAuth app omitiendo esa variable. Usa otra aplicación para desarrollo, con el callback de su propio dominio `.convex.site`. Los correos de magic link pasan por Resend; el enlace caduca en 10 minutos, se usa una vez y su token se almacena mediante un hash. No se registran enlaces ni tokens en logs.
 
-Para enviar desde un dominio propio, verifícalo en Resend publicando los registros DKIM y SPF/MX indicados. Mantén Resend en Free y Convex en Free, sin activar planes con facturación por consumo. Las cuotas de los proveedores se aplican: al agotarlas se puede interrumpir el acceso o guardado. El juego sin cuenta sigue funcionando mientras se puedan descargar sus archivos.
+Para enviar desde un dominio propio, verifícalo en Resend publicando los registros DKIM y SPF/MX indicados. Atlas usa el dominio completo `danielsaldarriaga.com`: el DKIM corresponde a `resend._domainkey` y el Return-Path de envío a `send`, con los valores exactos que entregue Resend. Conserva los MX existentes del dominio raíz. Mantén Resend en Free y Convex en Free, sin activar planes con facturación por consumo. Las cuotas de los proveedores se aplican: al agotarlas se puede interrumpir el acceso o guardado. El juego sin cuenta sigue funcionando mientras se puedan descargar sus archivos.
 
 ## Datos y límites
 
